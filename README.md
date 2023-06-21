@@ -50,9 +50,9 @@
 
 ## Task 0: Preparation
 
-- [ ] 在 `raytracer/Cargo.toml` 中，修改作者信息
-- [ ] 在 `LICENSE` 中，将作者修改为自己。你也可以换成其他许可证
-- [ ] 配置 Rust 环境
+- [x] 在 `raytracer/Cargo.toml` 中，修改作者信息
+- [x] 在 `LICENSE` 中，将作者修改为自己。你也可以换成其他许可证
+- [x] 配置 Rust 环境
   - 使用 [rustup](https://www.rustwiki.org.cn/zh-CN/book/ch01-01-installation.html) 安装 Rust（推荐使用[梯子](https://glados.rocks/)访问，该梯子可凭教育邮箱免费使用一年）。如果下载速度很慢，可以考虑使用 [SJTUG Mirror](https://mirrors.sjtug.sjtu.edu.cn) 的 rust-static 和 crates.io 镜像
   - 之后，你需要安装一些工具。首先，你需要定位到项目目录。而后，运行 `rustup component add clippy rustfmt`
   - 接着，运行 `make ci`。如果程序可以正常运行，那么环境就已经配置成功了
@@ -63,7 +63,7 @@
     - 程序生成的结果会出现在 GitHub Actions 的 Artifacts 中。`output` 文件夹下的内容应当是程序运行时生成的。对 output 文件夹的修改不应该被同步到 GitHub 上（参考 `.gitignore`）
   - 💠你也可以自己学习设计工作流程（可以参考题面 Repo `.github/workflows/cargo.yml`）
   - 我们要求所有的 checkpoints 呈现在 GitHub Actions 中，不得晚于 Deadlines，有三天的 Late days
-- [ ] 最后，你可以把 `README.md` 中的教程部分删除，换成自己项目的描述、运行方法等信息
+- [x] 最后，你可以把 `README.md` 中的教程部分删除，换成自己项目的描述、运行方法等信息
 
 ## Deadline 0: 2023-06-21 23:59
 
