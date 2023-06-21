@@ -56,7 +56,7 @@
   - 使用 [rustup](https://www.rustwiki.org.cn/zh-CN/book/ch01-01-installation.html) 安装 Rust（推荐使用[梯子](https://glados.rocks/)访问，该梯子可凭教育邮箱免费使用一年）。如果下载速度很慢，可以考虑使用 [SJTUG Mirror](https://mirrors.sjtug.sjtu.edu.cn) 的 rust-static 和 crates.io 镜像
   - 之后，你需要安装一些工具。首先，你需要定位到项目目录。而后，运行 `rustup component add clippy rustfmt`
   - 接着，运行 `make ci`。如果程序可以正常运行，那么环境就已经配置成功了
-- [ ] 配置 GitHub Actions
+- [?] 配置 GitHub Actions
   - 如果你的 Repo 直接使用题面模板
     - 那么在上述操作完成后，将库 push 到 GitHub 上。在 GitHub Action 中，“Lint and Test” 和 “Build and Upload” 都应当通过（该功能位于 Github Repo 网页上方项目名称旁的 Actions 选项卡）
     - Repo 已经设置好的 Github actions 需要 `git push --tags` 才能触发，即 `git push` 时提交任意标签。
