@@ -28,9 +28,9 @@ fn hit_sphere(center: Vec3, radius: f64, r: Ray) -> f64 {
     let c = Vec3::dot(oc, oc) - radius * radius;
     let discriminant = half_b * half_b - a * c;
     if discriminant < 0.0 {
-        return -1.0;
+        -1.0
     } else {
-        return (-half_b - discriminant.sqrt()) / a;
+        (-half_b - discriminant.sqrt()) / a
     }
 }
 
@@ -41,7 +41,7 @@ fn ray_color(r: Ray, world: &dyn Hittable) -> Vec3 {
 
     let unit_direction = Vec3::unit_vector(r.direction);
     let t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0);
+    (1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
 fn main() {
