@@ -6,10 +6,10 @@ mod sphere;
 mod vec3;
 
 use color::write_color;
-use image::{ImageBuffer, RgbImage};
-use indicatif::ProgressBar;
 use hittable::Hittable;
 use hittable_list::HittableList;
+use image::{ImageBuffer, RgbImage};
+use indicatif::ProgressBar;
 use ray::Ray;
 use sphere::Sphere;
 use std::fs::File;
