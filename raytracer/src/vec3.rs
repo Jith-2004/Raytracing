@@ -201,33 +201,33 @@ impl DivAssign<f64> for Vec3 {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-    // use super::*;
-    // #[test]
-    // fn test_new() {
-    //     assert_eq!(Vec3::new(1.0, 2.0, 3.0), Vec3::new(1.0, 2.0, 3.0));
-    // }
-    // #[test]
-    // fn test_add() {
-    //     assert_eq!(
-    //         Vec3::new(1.0, 0.0, -1.0) + Vec3::new(2.0, 4.0, 6.0),
-    //         Vec3::new(3.0, 4.0, 5.0)
-    //     )
-    // }
-    // #[test]
-    // fn test_add_assign() {
-    //     let mut x = Vec3::new(1.0, 0.0, -1.0);
-    //     x += Vec3::new(2.0, 4.0, 6.0);
-    //     assert_eq!(x, Vec3::new(3.0, 4.0, 5.0))
-    // }
-    // #[test]
-    // fn test_add_f64() {
-    //     assert_eq!(
-    //         Vec3::new(1.0, 0.0, -1.0) + 233.0,
-    //         Vec3::new(234.0, 233.0, 232.0)
-    //     )
-    // }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_new() {
+        assert_eq!(Vec3::new(1.0, 2.0, 3.0), Vec3::new(1.0, 2.0, 3.0));
+    }
+    #[test]
+    fn test_add() {
+        assert_eq!(
+            Vec3::new(1.0, 0.0, -1.0) + Vec3::new(2.0, 4.0, 6.0),
+            Vec3::new(3.0, 4.0, 5.0)
+        )
+    }
+    #[test]
+    fn test_add_assign() {
+        let mut x = Vec3::new(1.0, 0.0, -1.0);
+        x += Vec3::new(2.0, 4.0, 6.0);
+        assert_eq!(x, Vec3::new(3.0, 4.0, 5.0))
+    }
+    #[test]
+    fn test_add_f64() {
+        assert_eq!(
+            Vec3::new(1.0, 0.0, -1.0) + 233.0,
+            Vec3::new(234.0, 233.0, 232.0)
+        )
+    }
     // #[test]
     // fn test_add_assign_f64() {
     //     let mut x = Vec3::new(1.0, 0.0, -1.0);
@@ -293,10 +293,10 @@ impl DivAssign<f64> for Vec3 {
     // fn test_neg() {
     //     assert_eq!(-Vec3::new(1.0, -2.0, 3.0), Vec3::new(-1.0, 2.0, -3.0));
     // }
-    // #[test]
-    // fn test_squared_length() {
-    //     assert_eq!(Vec3::new(1.0, 2.0, 3.0).squared_length(), 14.0);
-    // }
+    #[test]
+    fn test_squared_length() {
+        assert_eq!(Vec3::new(1.0, 2.0, 3.0).squared_length(), 14.0);
+    }
     // #[test]
     // fn test_length() {
     //     assert_eq!(
@@ -317,4 +317,4 @@ impl DivAssign<f64> for Vec3 {
     // fn test_unit_panic() {
     //     Vec3::new(0.0, 0.0, 0.0).unit();
     // }
-// }
+}
