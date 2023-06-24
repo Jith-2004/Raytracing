@@ -28,7 +28,6 @@ impl Hittable for Sphere {
         }
 
         let root = discriminant.sqrt();
-        
         let mut temp = (-half_b - root) / a;
         if temp < t_min || t_max < temp {
             temp = (-half_b + root) / a;
