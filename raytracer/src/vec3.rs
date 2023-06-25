@@ -96,6 +96,29 @@ impl Vec3 {
     pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
         v - 2.0 * Vec3::dot(v, n) * n
     }
+
+    pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = Self::dot(-uv, n);
+        let r_out_parallel =  etai_over_etat * (uv + cos_theta * n);
+        let r_out_perp = -(1.0 - r_out_parallel.squared_length()).sqrt() * n;
+        r_out_parallel + r_out_perp
+    }
+
+    pub fn schlick(cosine: f64, ref_idx: f64) -> f64 {
+        let mut r_0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+        r_0 = r_0 * r_0;
+        r_0 + (1.0 - r_0) * f64::powf(1.0 - cosine, 5.0)
+    }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        let mut rng = rand::thread_rng();
+        loop {
+            let p = Vec3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0);
+            if p.squared_length() < 1.0 {
+                return p;
+            }
+        }
+    }
 }
 
 impl Neg for Vec3 {

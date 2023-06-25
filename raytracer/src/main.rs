@@ -15,6 +15,7 @@ use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
 use material::Lambertian;
 use material::Metal;
+use material::Dielectric;
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
@@ -61,11 +62,12 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let height: usize = 400;
-    let width: usize = 800;
+    let height: usize = 200;
+    let width: usize = 400;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let max_depth = 50;
+    let max_depth = 40;
+    let aspect_ratio = 2.0;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -79,38 +81,73 @@ fn main() {
         ProgressBar::new((height * width) as u64)
     };
 
+            
+
     let mut world = HittableList::new();
-    let material_ground = Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
-    let material_center = Lambertian::new(Vec3::new(0.7, 0.3, 0.3));
-    let material_left = Metal::new(Vec3::new(0.8, 0.8, 0.8));
-    let material_right = Metal::new(Vec3::new(0.8, 0.6, 0.2));
-
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, -100.5, -1.0),
-        100.0,
-        material_ground,
-    )));
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 0.0, -1.0),
-        0.5,
-        material_center,
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(Vec3::new(0.5, 0.5, 0.5)),
     )));
 
     world.add(Box::new(Sphere::new(
-        Vec3::new(-1.0, 0.0, -1.0),
-        0.5,
-        material_left,
+        Vec3::new(0.0, 1.0, 0.0),
+        1.0,
+        Dielectric::new(1.5),
     )));
 
     world.add(Box::new(Sphere::new(
-        Vec3::new(1.0, 0.0, -1.0),
-        0.5,
-        material_right,
+        Vec3::new(-4.0, 1.0, 0.0),
+        1.0,
+        Lambertian::new(Vec3::new(0.4, 0.2, 0.1)),
     )));
 
-    let cam = Camera::new();
+    world.add(Box::new(Sphere::new(
+        Vec3::new(4.0, 1.0, 0.0),
+        1.0,
+        Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0),
+    )));
 
     let mut rng = rand::thread_rng();
+
+    for a in -5..5 {
+        for b in -5..5 {
+            let choose_mat = rng.gen_range(0.0..1.0);
+            let center = Vec3::new(a as f64 + 0.9 * rng.gen_range(0.0..1.0), 0.2, b as f64 + 0.9 * rng.gen_range(0.0..1.0));
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    let albedo = Vec3::random() * Vec3::random();
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Lambertian::new(albedo),
+                    )));
+                } else if choose_mat < 0.95 {
+                    let albedo = Vec3::random_(0.5, 1.0);
+                    let fuzz = rng.gen_range(0.0..0.5);
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Metal::new(albedo,fuzz),
+                    )));
+                } else {
+                    world.add(Box::new(Sphere::new(
+                        center,
+                        0.2,
+                        Dielectric::new(1.5),
+                    )));
+                }
+            }
+        }
+    }
+
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat = Vec3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 100.0;
+    let aperture = 0.1;
+
+    let cam = Camera::new(lookfrom, lookat, vup, 20.0, aspect_ratio, aperture, dist_to_focus);
 
     for j in (0..=height - 1).rev() {
         for i in 0..width {
