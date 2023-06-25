@@ -83,7 +83,8 @@ fn main() {
     let mut rng = rand::thread_rng();
 
     for j in (0..=height - 1).rev() {
-        for i in 0..width { 
+
+        for i in 0..width {
             let mut pixel_color: [u8; 3] = [0, 0, 0];
             let mut pixel_color_ = Vec3::zero();
             for _s in 0..quality {
