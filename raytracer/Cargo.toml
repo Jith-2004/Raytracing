@@ -10,3 +10,4 @@ edition = "2021"
 image = "0.24.2"
 console = "0.15.0"    # console text format
 indicatif = "0.16.2" # progress bar
+rand = "0.8.3"
