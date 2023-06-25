@@ -62,11 +62,11 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let height: usize = 200;
-    let width: usize = 400;
+    let height: usize = 400;
+    let width: usize = 800;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let max_depth = 40;
+    let max_depth = 30;
     let aspect_ratio = 2.0;
 
     // Create image data
@@ -108,8 +108,8 @@ fn main() {
 
     let mut rng = rand::thread_rng();
 
-    for a in -5..5 {
-        for b in -5..5 {
+    for a in -8..8 {
+        for b in -8..8 {
             let choose_mat = rng.gen_range(0.0..1.0);
             let center = Vec3::new(
                 a as f64 + 0.9 * rng.gen_range(0.0..1.0),
@@ -134,7 +134,7 @@ fn main() {
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
-    let dist_to_focus = 100.0;
+    let dist_to_focus = 5.0;
     let aperture = 0.1;
 
     let cam = Camera::new(
