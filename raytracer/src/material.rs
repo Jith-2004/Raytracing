@@ -37,7 +37,7 @@ pub struct Metal {
 
 impl Metal {
     pub fn new(color: Vec3, f: f64) -> Self {
-        Self { 
+        Self {
             albedo: color,
             fuzz: if f < 1.0 { f } else { 1.0 },
         }

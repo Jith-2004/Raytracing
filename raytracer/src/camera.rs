@@ -30,7 +30,7 @@ impl Camera {
         let v = Vec3::cross(w, u);
         let horizontal = 2.0 * half_width * u * focus_dist;
         let vertical = 2.0 * half_height * v * focus_dist;
-        let lower_left_corner = 
+        let lower_left_corner =
             origin - half_width * u * focus_dist - half_height * v * focus_dist - w * focus_dist;
 
         Self {
