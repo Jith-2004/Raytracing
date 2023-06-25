@@ -100,6 +100,6 @@ impl Material for Dielectric {
         }
         let refracted = Vec3::refract(unit_direction, hit_record.normal, etai_over_etat);
         let scattered = Ray::new(hit_record.p, refracted);
-        return Some((scattered, attenuation));
+        Some((scattered, attenuation))
     }
 }
