@@ -43,10 +43,7 @@ impl Material for Metal {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
         let unit_ray_direction = Vec3::unit_vector(r_in.direction);
         let reflected = Vec3::reflect(unit_ray_direction, hit_record.normal);
-        let scattered = Ray::new(
-            hit_record.p,
-            reflected,
-        );
+        let scattered = Ray::new(hit_record.p, reflected);
         let attenuation = self.albedo;
         if Vec3::dot(scattered.direction, hit_record.normal) > 0.0 {
             Some((scattered, attenuation))

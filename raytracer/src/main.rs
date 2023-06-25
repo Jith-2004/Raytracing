@@ -2,19 +2,19 @@ mod camera;
 mod color;
 mod hittable;
 mod hittable_list;
+mod material;
 mod ray;
 mod sphere;
-mod material;
 mod vec3;
 
-use material::Metal;
-use material::Lambertian;
 use camera::Camera;
 use color::write_color;
 use hittable::Hittable;
 use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
+use material::Metal;
+use material::Lambertian;
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
@@ -80,7 +80,6 @@ fn main() {
     };
 
     let mut world = HittableList::new();
-    
     let material_ground = Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
     let material_center = Lambertian::new(Vec3::new(0.7, 0.3, 0.3));
     let material_left = Metal::new(Vec3::new(0.8, 0.8, 0.8));
