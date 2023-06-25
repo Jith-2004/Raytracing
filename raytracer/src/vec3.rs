@@ -77,14 +77,14 @@ impl Vec3 {
     }
     pub fn random_unit_vector() -> Vec3 {
         let point = Vec3::random_in_unit_sphere();
-        return Vec3::unit_vector(point);
+        Vec3::unit_vector(point)
     }
     pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
         let in_unit_sphere = Vec3::random_in_unit_sphere();
         if Vec3::dot(in_unit_sphere, normal) > 0.0 {
-            return in_unit_sphere;
+            in_unit_sphere
         } else {
-            return -in_unit_sphere;
+            -in_unit_sphere
         }
     }
 

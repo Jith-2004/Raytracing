@@ -24,7 +24,7 @@ impl<'a> HitRecord<'a> {
             normal,
             t,
             front_face,
-            mat_ptr: mat_ptr,
+            mat_ptr,
         }
     }
 }
