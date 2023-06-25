@@ -4,8 +4,11 @@ mod hittable;
 mod hittable_list;
 mod ray;
 mod sphere;
+mod material;
 mod vec3;
 
+use material::Metal;
+use material::Lambertian;
 use camera::Camera;
 use color::write_color;
 use hittable::Hittable;
@@ -29,10 +32,12 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Vec3 {
         return Vec3::zero();
     }
 
-    if let Some(hit_record) = world.hit(*r, 0.0, f64::INFINITY) {
-        let target: Vec3 = hit_record.p + hit_record.normal + Vec3::random_in_unit_sphere();
-        let ray = Ray::new(hit_record.p, target - hit_record.p);
-        return 0.5 * ray_color(&ray, world, depth - 1);
+    if let Some(hit_record) = world.hit(*r, 0.001, f64::INFINITY) {
+        if let Some((scattered, attenuation)) = hit_record.mat_ptr.scatter(&r, &hit_record) {
+            return attenuation * ray_color(&scattered, world, depth - 1);
+        } else {
+            return Vec3::zero();
+        }
     }
 
     let unit_direction = Vec3::unit_vector(r.direction);
@@ -60,7 +65,7 @@ fn main() {
     let width: usize = 800;
     let path = "output/test.jpg";
     let quality = 60; // From 0 to 100, suggested value: 60
-    let max_depth = 2;
+    let max_depth = 50;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -75,8 +80,34 @@ fn main() {
     };
 
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0)));
+    
+    let material_ground = Lambertian::new(Vec3::new(0.8, 0.8, 0.0));
+    let material_center = Lambertian::new(Vec3::new(0.7, 0.3, 0.3));
+    let material_left = Metal::new(Vec3::new(0.8, 0.8, 0.8));
+    let material_right = Metal::new(Vec3::new(0.8, 0.6, 0.2));
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+
+    world.add(Box::new(Sphere::new(
+        Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
+    )));
 
     let cam = Camera::new();
 

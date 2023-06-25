@@ -75,6 +75,27 @@ impl Vec3 {
             }
         }
     }
+    pub fn random_unit_vector() -> Vec3 {
+        let point = Vec3::random_in_unit_sphere();
+        return Vec3::unit_vector(point);
+    }
+    pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
+        let in_unit_sphere = Vec3::random_in_unit_sphere();
+        if Vec3::dot(in_unit_sphere, normal) > 0.0 {
+            return in_unit_sphere;
+        } else {
+            return -in_unit_sphere;
+        }
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let border: f64 = 1e-8;
+        self.x.abs() < border && self.y.abs() < border && self.z.abs() < border
+    }
+
+    pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+        v - 2.0 * Vec3::dot(v, n) * n
+    }
 }
 
 impl Neg for Vec3 {
