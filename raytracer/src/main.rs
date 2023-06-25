@@ -13,9 +13,9 @@ use hittable::Hittable;
 use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
+use material::Dielectric;
 use material::Lambertian;
 use material::Metal;
-use material::Dielectric;
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
@@ -81,8 +81,6 @@ fn main() {
         ProgressBar::new((height * width) as u64)
     };
 
-            
-
     let mut world = HittableList::new();
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
@@ -113,29 +111,21 @@ fn main() {
     for a in -5..5 {
         for b in -5..5 {
             let choose_mat = rng.gen_range(0.0..1.0);
-            let center = Vec3::new(a as f64 + 0.9 * rng.gen_range(0.0..1.0), 0.2, b as f64 + 0.9 * rng.gen_range(0.0..1.0));
+            let center = Vec3::new(
+                a as f64 + 0.9 * rng.gen_range(0.0..1.0),
+                0.2,
+                b as f64 + 0.9 * rng.gen_range(0.0..1.0),
+            );
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     let albedo = Vec3::random() * Vec3::random();
-                    world.add(Box::new(Sphere::new(
-                        center,
-                        0.2,
-                        Lambertian::new(albedo),
-                    )));
+                    world.add(Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo))));
                 } else if choose_mat < 0.95 {
                     let albedo = Vec3::random_(0.5, 1.0);
                     let fuzz = rng.gen_range(0.0..0.5);
-                    world.add(Box::new(Sphere::new(
-                        center,
-                        0.2,
-                        Metal::new(albedo,fuzz),
-                    )));
+                    world.add(Box::new(Sphere::new(center, 0.2, Metal::new(albedo, fuzz))));
                 } else {
-                    world.add(Box::new(Sphere::new(
-                        center,
-                        0.2,
-                        Dielectric::new(1.5),
-                    )));
+                    world.add(Box::new(Sphere::new(center, 0.2, Dielectric::new(1.5))));
                 }
             }
         }
@@ -147,7 +137,15 @@ fn main() {
     let dist_to_focus = 100.0;
     let aperture = 0.1;
 
-    let cam = Camera::new(lookfrom, lookat, vup, 20.0, aspect_ratio, aperture, dist_to_focus);
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        20.0,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+    );
 
     for j in (0..=height - 1).rev() {
         for i in 0..width {

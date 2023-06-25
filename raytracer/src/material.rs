@@ -39,11 +39,7 @@ impl Metal {
     pub fn new(color: Vec3, f: f64) -> Self {
         Self { 
             albedo: color,
-            fuzz: if f < 1.0 {
-                f
-            } else {
-                1.0
-            }
+            fuzz: if f < 1.0 { f } else { 1.0 },
         }
     }
 }
@@ -52,7 +48,10 @@ impl Material for Metal {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
         let unit_ray_direction = Vec3::unit_vector(r_in.direction);
         let reflected = Vec3::reflect(unit_ray_direction, hit_record.normal);
-        let scattered = Ray::new(hit_record.p, reflected + self.fuzz * Vec3::random_in_unit_sphere());
+        let scattered = Ray::new(
+            hit_record.p,
+            reflected + self.fuzz * Vec3::random_in_unit_sphere(),
+        );
         let attenuation = self.albedo;
         if Vec3::dot(scattered.direction, hit_record.normal) > 0.0 {
             Some((scattered, attenuation))
