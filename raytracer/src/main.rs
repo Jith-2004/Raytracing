@@ -1,5 +1,5 @@
-mod color;
 mod camera;
+mod color;
 mod hittable;
 mod hittable_list;
 mod ray;
@@ -12,11 +12,11 @@ use hittable::Hittable;
 use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
+use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
 use std::fs::File;
 pub use vec3::Vec3;
-use rand::Rng;
 
 const AUTHOR: &str = "Stewie";
 
