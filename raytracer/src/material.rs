@@ -18,13 +18,13 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _r_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
+    fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
         let mut scatter_direction = hit_record.normal + Vec3::random_unit_vector();
         if scatter_direction.near_zero() {
             scatter_direction = hit_record.normal;
         }
 
-        let scattered: Ray = Ray::new(hit_record.p, scatter_direction);
+        let scattered: Ray = Ray::new(hit_record.p, scatter_direction, r_in.time);
         let attenuation = self.albedo;
         Some((scattered, attenuation))
     }
@@ -51,6 +51,7 @@ impl Material for Metal {
         let scattered = Ray::new(
             hit_record.p,
             reflected + self.fuzz * Vec3::random_in_unit_sphere(),
+            r_in.time,
         );
         let attenuation = self.albedo;
         if Vec3::dot(scattered.direction, hit_record.normal) > 0.0 {
@@ -88,18 +89,18 @@ impl Material for Dielectric {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
         if etai_over_etat * sin_theta > 1.0 {
             let reflected = Vec3::reflect(unit_direction, hit_record.normal);
-            let scattered = Ray::new(hit_record.p, reflected);
+            let scattered = Ray::new(hit_record.p, reflected, r_in.time);
             return Some((scattered, attenuation));
         }
         let reflect_prob = Vec3::schlick(cos_theta, etai_over_etat);
         let mut rng = rand::thread_rng();
         if rng.gen_range(0.0..1.0) < reflect_prob {
             let reflected = Vec3::reflect(unit_direction, hit_record.normal);
-            let scattered = Ray::new(hit_record.p, reflected);
+            let scattered = Ray::new(hit_record.p, reflected, r_in.time);
             return Some((scattered, attenuation));
         }
         let refracted = Vec3::refract(unit_direction, hit_record.normal, etai_over_etat);
-        let scattered = Ray::new(hit_record.p, refracted);
+        let scattered = Ray::new(hit_record.p, refracted, r_in.time);
         Some((scattered, attenuation))
     }
 }

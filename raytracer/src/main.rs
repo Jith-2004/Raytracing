@@ -3,6 +3,7 @@ mod color;
 mod hittable;
 mod hittable_list;
 mod material;
+mod moving_sphere;
 mod ray;
 mod sphere;
 mod vec3;
@@ -16,6 +17,7 @@ use indicatif::ProgressBar;
 use material::Dielectric;
 use material::Lambertian;
 use material::Metal;
+use moving_sphere::MovingSphere;
 use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
@@ -64,7 +66,7 @@ fn main() {
 
     let height: usize = 800;
     let width: usize = 1200;
-    let path = "output/test.jpg";
+    let path = "output/2.1.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.5;
@@ -108,8 +110,8 @@ fn main() {
 
     let mut rng = rand::thread_rng();
 
-    for a in -5..5 {
-        for b in -5..5 {
+    for a in -11..11 {
+        for b in -11..11 {
             let choose_mat = rng.gen_range(0.0..1.0);
             let center = Vec3::new(
                 a as f64 + 0.9 * rng.gen_range(0.0..1.0),
@@ -119,7 +121,15 @@ fn main() {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     let albedo = Vec3::random() * Vec3::random();
-                    world.add(Box::new(Sphere::new(center, 0.2, Lambertian::new(albedo))));
+                    let center2 = center + Vec3::new(0.0, rng.gen_range(0.0..0.5), 0.0);
+                    world.add(Box::new(MovingSphere::new(
+                        center,
+                        center2,
+                        0.0,
+                        1.0,
+                        0.2,
+                        Lambertian::new(albedo),
+                    )));
                 } else if choose_mat < 0.95 {
                     let albedo = Vec3::random_(0.5, 1.0);
                     let fuzz = rng.gen_range(0.0..0.5);
@@ -145,6 +155,8 @@ fn main() {
         aspect_ratio,
         aperture,
         dist_to_focus,
+        0.0,
+        1.0,
     );
 
     for j in (0..=height - 1).rev() {
