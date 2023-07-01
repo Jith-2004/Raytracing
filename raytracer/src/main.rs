@@ -24,7 +24,7 @@ use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
 use std::fs::File;
-use texture::{CheckerTexture, SolidColor, Texture};
+use texture::{CheckerTexture, SolidColor};
 pub use vec3::Vec3;
 
 const AUTHOR: &str = "Stewie";

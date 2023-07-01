@@ -1,12 +1,12 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
-pub struct AABB {
+pub struct Aabb {
     pub minimum: Vec3,
     pub maximum: Vec3,
 }
 
-impl AABB {
+impl Aabb {
     pub fn new(a: Vec3, b: Vec3) -> Self {
         Self {
             minimum: a,
@@ -72,10 +72,10 @@ impl AABB {
         if _t_max <= _t_min {
             return false;
         }
-        return true;
+        true
     }
 
-    pub fn surrounding_box(box0: AABB, box1: AABB) -> AABB {
+    pub fn surrounding_box(box0: Aabb, box1: Aabb) -> Aabb {
         let small = Vec3::new(
             if box0.minimum.x() < box1.minimum.x() {
                 box0.minimum.x()
@@ -112,6 +112,6 @@ impl AABB {
             },
         );
 
-        AABB::new(small, big)
+        Aabb::new(small, big)
     }
 }
