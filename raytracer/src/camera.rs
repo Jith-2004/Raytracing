@@ -9,6 +9,9 @@ pub struct Camera {
     vertical: Vec3,
     lower_left_corner: Vec3,
     lens_radius: f64,
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
     time0: f64,
     time1: f64,
 }
@@ -48,16 +51,19 @@ impl Camera {
             vertical,
             lower_left_corner,
             lens_radius,
+            u,
+            v,
+            w,
             time0,
             time1,
         }
     }
 
-    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
+    pub fn get_ray(&self, s: f64, t: f64) -> Ray {
         let rd = self.lens_radius * Vec3::random_in_unit_disk();
-        let offset = u * rd.x() + v * rd.y();
+        let offset = self.u * rd.x() + self.v * rd.y();
         let direction =
-            self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin - offset;
+            self.lower_left_corner + s * self.horizontal + t * self.vertical - self.origin - offset;
         let mut rng = rand::thread_rng();
         Ray::new(
             self.origin + offset,

@@ -5,6 +5,7 @@ mod hittable;
 mod hittable_list;
 mod material;
 mod moving_sphere;
+mod perlin;
 mod ray;
 mod sphere;
 mod texture;
@@ -24,7 +25,7 @@ use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
 use std::fs::File;
-use texture::{CheckerTexture, SolidColor};
+use texture::{CheckerTexture, NoiseTexture, SolidColor};
 pub use vec3::Vec3;
 
 const AUTHOR: &str = "Stewie";
@@ -69,7 +70,7 @@ fn main() {
 
     let height: usize = 800;
     let width: usize = 1200;
-    let path = "output/2.4.jpg";
+    let path = "output/2.5.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.5;
@@ -88,17 +89,17 @@ fn main() {
 
     let mut world = HittableList::new();
 
-    let checker_texture = CheckerTexture::new(Vec3::new(0.2, 0.3, 0.1), Vec3::new(0.9, 0.9, 0.9));
+    let pertext = NoiseTexture::new();
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, -10.0, 0.0),
-        10.0,
-        Lambertian::new(Box::new(checker_texture)),
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(Box::new(pertext)),
     )));
-    let checker_texture = CheckerTexture::new(Vec3::new(0.2, 0.3, 0.1), Vec3::new(0.9, 0.9, 0.9));
+    let pertext = NoiseTexture::new();
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 10.0, 0.0),
-        10.0,
-        Lambertian::new(Box::new(checker_texture)),
+        Vec3::new(0.0, 2.0, 0.0),
+        2.0,
+        Lambertian::new(Box::new(pertext)),
     )));
 
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
