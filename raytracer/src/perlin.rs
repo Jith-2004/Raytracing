@@ -57,9 +57,12 @@ impl Perlin {
     }
 
     pub fn noise(&self, p: &Vec3) -> f64 {
-        let u = p.x() - f64::floor(p.x()) as f64;
-        let v = p.y() - f64::floor(p.y()) as f64;
-        let w = p.z() - f64::floor(p.z()) as f64;
+        let mut u = p.x() - f64::floor(p.x()) as f64;
+        let mut v = p.y() - f64::floor(p.y()) as f64;
+        let mut w = p.z() - f64::floor(p.z()) as f64;
+        let u = u * u * (3.0 - 2.0 * u);
+        let v = v * v * (3.0 - 2.0 * v);
+        let w = w * w * (3.0 - 2.0 * w);
         let i = f64::floor(p.x()) as i32;
         let j = f64::floor(p.y()) as i32;
         let k = f64::floor(p.z()) as i32;
