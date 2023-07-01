@@ -70,7 +70,7 @@ fn main() {
 
     let height: usize = 800;
     let width: usize = 1200;
-    let path = "output/2.7.jpg";
+    let path = "output/2.8.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.5;
@@ -89,13 +89,13 @@ fn main() {
 
     let mut world = HittableList::new();
 
-    let pertext = NoiseTexture::new();
+    let pertext = NoiseTexture::new(4.0);
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
         Lambertian::new(Box::new(pertext)),
     )));
-    let pertext = NoiseTexture::new();
+    let pertext = NoiseTexture::new(4.0);
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, 2.0, 0.0),
         2.0,
