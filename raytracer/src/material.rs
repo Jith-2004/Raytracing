@@ -1,5 +1,6 @@
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
+use crate::texture::{CheckerTexture, Texture};
 use crate::vec3::Vec3;
 use rand::Rng;
 
@@ -8,11 +9,11 @@ pub trait Material {
 }
 
 pub struct Lambertian {
-    pub albedo: Vec3,
+    pub albedo: Box<dyn Texture>,
 }
 
 impl Lambertian {
-    pub fn new(color: Vec3) -> Self {
+    pub fn new(color: Box<dyn Texture>) -> Self {
         Self { albedo: color }
     }
 }
@@ -25,7 +26,7 @@ impl Material for Lambertian {
         }
 
         let scattered: Ray = Ray::new(hit_record.p, scatter_direction, r_in.time);
-        let attenuation = self.albedo;
+        let attenuation = self.albedo.value(hit_record.u, hit_record.v, &hit_record.p);
         Some((scattered, attenuation))
     }
 }

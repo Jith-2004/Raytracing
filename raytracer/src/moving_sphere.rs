@@ -1,3 +1,4 @@
+use crate::aabb::AABB;
 use crate::hittable::{HitRecord, Hittable};
 use crate::material::Material;
 use crate::ray::Ray;
@@ -27,6 +28,14 @@ impl<M: Material> MovingSphere<M> {
         self.center0
             + (self.center1 - self.center0) * ((time - self.time0) / (self.time1 - self.time0))
     }
+
+    pub fn get_sphere_uv(p: &Vec3) -> (f64, f64) {
+        let theta = f64::acos(-p.y());
+        let phi = f64::atan2(-p.z(), p.x()) + std::f64::consts::PI;
+        let u = phi / (2.0 * std::f64::consts::PI);
+        let v = theta / std::f64::consts::PI;
+        (u, v)
+    }
 }
 
 impl<M: Material> Hittable for MovingSphere<M> {
@@ -52,7 +61,21 @@ impl<M: Material> Hittable for MovingSphere<M> {
         let t = temp;
         let p = r.at(t);
         let outward_normal = (p - self.center(r.time)) / self.radius;
-        let hit_rec = HitRecord::new(p, t, outward_normal, r, &self.mat_ptr);
+        let (u, v) = MovingSphere::<M>::get_sphere_uv(&outward_normal);
+        let hit_rec = HitRecord::new(p, t, u, v, outward_normal, r, &self.mat_ptr);
         Some(hit_rec)
+    }
+
+    fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<AABB> {
+        let box0 = AABB::new(
+            self.center(_time0) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center(_time0) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+        let box1 = AABB::new(
+            self.center(_time1) - Vec3::new(self.radius, self.radius, self.radius),
+            self.center(_time1) + Vec3::new(self.radius, self.radius, self.radius),
+        );
+        let output_box = AABB::surrounding_box(box0, box1);
+        Some(output_box)
     }
 }

@@ -1,3 +1,4 @@
+mod aabb;
 mod camera;
 mod color;
 mod hittable;
@@ -6,6 +7,7 @@ mod material;
 mod moving_sphere;
 mod ray;
 mod sphere;
+mod texture;
 mod vec3;
 
 use camera::Camera;
@@ -22,6 +24,7 @@ use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
 use std::fs::File;
+use texture::{CheckerTexture, SolidColor, Texture};
 pub use vec3::Vec3;
 
 const AUTHOR: &str = "Stewie";
@@ -64,11 +67,11 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let height: usize = 800;
-    let width: usize = 1200;
-    let path = "output/2.1.jpg";
-    let quality = 100; // From 0 to 100, suggested value: 60
-    let max_depth = 50;
+    let height: usize = 200;
+    let width: usize = 300;
+    let path = "output/2.3.jpg";
+    let quality = 60; // From 0 to 100, suggested value: 60
+    let max_depth = 30;
     let aspect_ratio = 1.5;
 
     // Create image data
@@ -84,10 +87,12 @@ fn main() {
     };
 
     let mut world = HittableList::new();
+
+    let checker_texture = CheckerTexture::new(Vec3::new(0.2, 0.3, 0.1), Vec3::new(0.9, 0.9, 0.9));
     world.add(Box::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
-        Lambertian::new(Vec3::new(0.5, 0.5, 0.5)),
+        Lambertian::new(Box::new(checker_texture)),
     )));
 
     world.add(Box::new(Sphere::new(
@@ -99,7 +104,7 @@ fn main() {
     world.add(Box::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
-        Lambertian::new(Vec3::new(0.4, 0.2, 0.1)),
+        Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.4, 0.2, 0.1)))),
     )));
 
     world.add(Box::new(Sphere::new(
@@ -120,7 +125,7 @@ fn main() {
             );
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
-                    let albedo = Vec3::random() * Vec3::random();
+                    let albedo = SolidColor::new(Vec3::random() * Vec3::random());
                     let center2 = center + Vec3::new(0.0, rng.gen_range(0.0..0.5), 0.0);
                     world.add(Box::new(MovingSphere::new(
                         center,
@@ -128,7 +133,7 @@ fn main() {
                         0.0,
                         1.0,
                         0.2,
-                        Lambertian::new(albedo),
+                        Lambertian::new(Box::new(albedo)),
                     )));
                 } else if choose_mat < 0.95 {
                     let albedo = Vec3::random_(0.5, 1.0);

@@ -1,3 +1,4 @@
+use crate::aabb::AABB;
 use crate::hittable::{HitRecord, Hittable};
 use crate::ray::Ray;
 use std::vec::Vec;
@@ -35,5 +36,26 @@ impl Hittable for HittableList {
         }
 
         hit_anything
+    }
+
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<AABB> {
+        if self.hittable_list.len() == 0 {
+            return None;
+        }
+        let mut output_box: Option<AABB> = None;
+        let mut first_box: bool = true;
+        for obj in self.hittable_list.iter() {
+            if let Some(temp_box) = obj.bounding_box(time0, time1) {
+                output_box = if first_box {
+                    Some(temp_box)
+                } else {
+                    Some(AABB::surrounding_box(output_box.unwrap(), temp_box))
+                };
+                first_box = false;
+            } else {
+                return None;
+            }
+        }
+        output_box
     }
 }
