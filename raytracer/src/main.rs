@@ -70,7 +70,7 @@ fn main() {
 
     let height: usize = 800;
     let width: usize = 1200;
-    let path = "output/2.10.jpg";
+    let path = "output/2.11.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.5;
