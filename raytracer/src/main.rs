@@ -12,7 +12,7 @@ mod sphere;
 mod texture;
 mod vec3;
 
-use aarect::XyRect;
+use aarect::{XyRect, XzRect, YzRect};
 use camera::Camera;
 use color::write_color;
 use hittable::Hittable;
@@ -70,12 +70,12 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let height: usize = 800;
-    let width: usize = 1200;
-    let path = "output/2.13.jpg";
+    let height: usize = 600;
+    let width: usize = 600;
+    let path = "output/2.14.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
-    let aspect_ratio = 1.5;
+    let aspect_ratio = 1.0;
 
     // Create image data
     let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
@@ -93,29 +93,62 @@ fn main() {
 
     let mut world = HittableList::new();
 
-    let pertext = NoiseTexture::new(4.0);
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 2.0, 0.0),
-        2.0,
-        Lambertian::new(Box::new(pertext)),
-    )));
-    let pertext = NoiseTexture::new(4.0);
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, -1000.0, 0.0),
-        1000.0,
-        Lambertian::new(Box::new(pertext)),
-    )));
-    world.add(Box::new(XyRect::new(
-        3.0,
-        5.0,
-        1.0,
-        3.0,
-        -2.0,
-        DiffuseLight::new(Box::new(SolidColor::new(Vec3::new(4.0, 4.0, 4.0)))),
+    world.add(Box::new(YzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.12, 0.45, 0.15)))),
     )));
 
-    let lookfrom = Vec3::new(26.0, 3.0, 6.0);
-    let lookat = Vec3::new(0.0, 0.0, 0.0);
+    world.add(Box::new(YzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.65, 0.05, 0.05)))),
+    )));
+
+    world.add(Box::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73)))),
+    )));
+
+    world.add(Box::new(XzRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73)))),
+    )));
+
+    world.add(Box::new(XyRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73)))),
+    )));
+
+    world.add(Box::new(XzRect::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        DiffuseLight::new(Box::new(SolidColor::new(Vec3::new(15.0, 15.0, 15.0)))),
+    )));
+
+    let lookfrom = Vec3::new(278.0, 278.0, -800.0);
+    let lookat = Vec3::new(278.0, 278.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.0;
@@ -124,7 +157,7 @@ fn main() {
         lookfrom,
         lookat,
         vup,
-        20.0,
+        40.0,
         aspect_ratio,
         aperture,
         dist_to_focus,
