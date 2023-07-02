@@ -1,5 +1,6 @@
 mod aabb;
 mod aarect;
+mod box_;
 mod camera;
 mod color;
 mod hittable;
@@ -13,6 +14,7 @@ mod texture;
 mod vec3;
 
 use aarect::{XyRect, XzRect, YzRect};
+use box_::Box_;
 use camera::Camera;
 use color::write_color;
 use hittable::Hittable;
@@ -72,7 +74,7 @@ fn main() {
 
     let height: usize = 600;
     let width: usize = 600;
-    let path = "output/2.14.jpg";
+    let path = "output/2.15.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.0;
@@ -145,6 +147,42 @@ fn main() {
         332.0,
         554.0,
         DiffuseLight::new(Box::new(SolidColor::new(Vec3::new(15.0, 15.0, 15.0)))),
+    )));
+    let white0 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white1 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white2 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white3 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white4 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white5 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white6 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    world.add(Box::new(Box_::new(
+        Vec3::new(130.0, 0.0, 65.0),
+        Vec3::new(295.0, 165.0, 230.0),
+        white0,
+        white1,
+        white2,
+        white3,
+        white4,
+        white5,
+        white6,
+    )));
+    let white0 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white1 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white2 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white3 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white4 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white5 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    let white6 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
+    world.add(Box::new(Box_::new(
+        Vec3::new(265.0, 0.0, 295.0),
+        Vec3::new(430.0, 330.0, 460.0),
+        white0,
+        white1,
+        white2,
+        white3,
+        white4,
+        white5,
+        white6,
     )));
 
     let lookfrom = Vec3::new(278.0, 278.0, -800.0);
