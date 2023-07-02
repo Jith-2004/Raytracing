@@ -6,6 +6,10 @@ use rand::Rng;
 
 pub trait Material {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)>;
+
+    fn emitted(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
+        Vec3::zero()
+    }
 }
 
 pub struct Lambertian {
@@ -103,5 +107,25 @@ impl Material for Dielectric {
         let refracted = Vec3::refract(unit_direction, hit_record.normal, etai_over_etat);
         let scattered = Ray::new(hit_record.p, refracted, r_in.time);
         Some((scattered, attenuation))
+    }
+}
+
+pub struct DiffuseLight {
+    emit: Box<dyn Texture>,
+}
+
+impl DiffuseLight {
+    pub fn new(emit: Box<dyn Texture>) -> Self {
+        Self { emit }
+    }
+}
+
+impl Material for DiffuseLight {
+    fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
+        None
+    }
+
+    fn emitted(&self, u: f64, v: f64, p: &Vec3) -> Vec3 {
+        self.emit.value(u, v, p)
     }
 }

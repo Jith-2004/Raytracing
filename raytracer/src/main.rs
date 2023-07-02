@@ -1,4 +1,5 @@
 mod aabb;
+mod aarect;
 mod camera;
 mod color;
 mod hittable;
@@ -11,15 +12,14 @@ mod sphere;
 mod texture;
 mod vec3;
 
+use aarect::XyRect;
 use camera::Camera;
 use color::write_color;
 use hittable::Hittable;
 use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-use material::Dielectric;
-use material::Lambertian;
-use material::Metal;
+use material::{Dielectric, DiffuseLight, Lambertian, Metal};
 use moving_sphere::MovingSphere;
 use rand::Rng;
 use ray::Ray;
@@ -35,22 +35,23 @@ fn is_ci() -> bool {
     option_env!("CI").unwrap_or_default() == "true"
 }
 
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Vec3 {
+fn ray_color(r: &Ray, background: &Vec3, world: &dyn Hittable, depth: i32) -> Vec3 {
     if depth <= 0 {
         return Vec3::zero();
     }
 
     if let Some(hit_record) = world.hit(*r, 0.001, f64::INFINITY) {
+        let emitted = hit_record
+            .mat_ptr
+            .emitted(hit_record.u, hit_record.v, &hit_record.p);
         if let Some((scattered, attenuation)) = hit_record.mat_ptr.scatter(r, &hit_record) {
-            return attenuation * ray_color(&scattered, world, depth - 1);
+            emitted + attenuation * ray_color(&scattered, background, world, depth - 1)
         } else {
-            return Vec3::zero();
+            return emitted;
         }
+    } else {
+        return *background;
     }
-
-    let unit_direction = Vec3::unit_vector(r.direction);
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    (1.0 - t) * Vec3::one() + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
 fn clamp(x: f64) -> f64 {
@@ -71,7 +72,7 @@ fn main() {
 
     let height: usize = 800;
     let width: usize = 1200;
-    let path = "output/2.12.jpg";
+    let path = "output/2.13.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.5;
@@ -88,17 +89,32 @@ fn main() {
         ProgressBar::new((height * width) as u64)
     };
 
+    let background = Vec3::zero();
+
     let mut world = HittableList::new();
 
-    let earth_texture = ImageTexture::new(&Path::new("earth.jpg"));
     let pertext = NoiseTexture::new(4.0);
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, 2.0, 0.0),
         2.0,
-        Lambertian::new(Box::new(earth_texture)),
+        Lambertian::new(Box::new(pertext)),
+    )));
+    let pertext = NoiseTexture::new(4.0);
+    world.add(Box::new(Sphere::new(
+        Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(Box::new(pertext)),
+    )));
+    world.add(Box::new(XyRect::new(
+        3.0,
+        5.0,
+        1.0,
+        3.0,
+        -2.0,
+        DiffuseLight::new(Box::new(SolidColor::new(Vec3::new(4.0, 4.0, 4.0)))),
     )));
 
-    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookfrom = Vec3::new(26.0, 3.0, 6.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
@@ -126,7 +142,7 @@ fn main() {
                 let u = (i as f64 + rng.gen::<f64>()) / (width - 1) as f64;
                 let v = (j as f64 + rng.gen::<f64>()) / (height - 1) as f64;
                 let r = cam.get_ray(u, v);
-                pixel_color_ += ray_color(&r, &world, max_depth);
+                pixel_color_ += ray_color(&r, &background, &world, max_depth);
             }
             pixel_color[0] += (clamp((pixel_color_.x() / quality as f64).sqrt()) * 255.999) as u8;
             pixel_color[1] += (clamp((pixel_color_.y() / quality as f64).sqrt()) * 255.999) as u8;
