@@ -25,7 +25,8 @@ use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
 use std::fs::File;
-use texture::{CheckerTexture, NoiseTexture, SolidColor};
+use std::path::Path;
+use texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColor};
 pub use vec3::Vec3;
 
 const AUTHOR: &str = "Stewie";
@@ -70,7 +71,7 @@ fn main() {
 
     let height: usize = 800;
     let width: usize = 1200;
-    let path = "output/2.11.jpg";
+    let path = "output/2.12.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.5;
@@ -89,17 +90,12 @@ fn main() {
 
     let mut world = HittableList::new();
 
+    let earth_texture = ImageTexture::new(&Path::new("earth.jpg"));
     let pertext = NoiseTexture::new(4.0);
     world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, -1000.0, 0.0),
-        1000.0,
-        Lambertian::new(Box::new(pertext)),
-    )));
-    let pertext = NoiseTexture::new(4.0);
-    world.add(Box::new(Sphere::new(
-        Vec3::new(0.0, 2.0, 0.0),
+        Vec3::new(0.0, 0.0, 0.0),
         2.0,
-        Lambertian::new(Box::new(pertext)),
+        Lambertian::new(Box::new(earth_texture)),
     )));
 
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
