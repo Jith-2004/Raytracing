@@ -1,9 +1,9 @@
 mod aabb;
-mod constant_medium;
 mod aarect;
 mod box_;
 mod camera;
 mod color;
+mod constant_medium;
 mod hittable;
 mod hittable_list;
 mod material;
@@ -14,16 +14,16 @@ mod sphere;
 mod texture;
 mod vec3;
 
-use constant_medium::ConstantMedium;
 use aarect::{XyRect, XzRect, YzRect};
 use box_::Box_;
 use camera::Camera;
 use color::write_color;
+use constant_medium::ConstantMedium;
 use hittable::{Hittable, RotateY, Translate};
 use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-use material::{Isotropic, Dielectric, DiffuseLight, Lambertian, Metal};
+use material::{Dielectric, DiffuseLight, Isotropic, Lambertian, Metal};
 use moving_sphere::MovingSphere;
 use rand::Rng;
 use ray::Ray;
@@ -74,11 +74,11 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let height: usize = 600;
-    let width: usize = 600;
-    let path = "output/2.17.jpg";
-    let quality = 100; // From 0 to 100, suggested value: 60
-    let max_depth = 50;
+    let height: usize = 300;
+    let width: usize = 300;
+    let path = "output/2.18.jpg";
+    let quality = 60; // From 0 to 100, suggested value: 60
+    let max_depth = 30;
     let aspect_ratio = 1.0;
 
     // Create image data
@@ -206,7 +206,7 @@ fn main() {
         Box::new(m),
     )));
 
-    let lookfrom = Vec3::new(278.0, 278.0, -800.0);
+    let lookfrom = Vec3::new(478.0, 278.0, -600.0);
     let lookat = Vec3::new(278.0, 278.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
