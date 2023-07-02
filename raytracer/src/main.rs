@@ -17,7 +17,7 @@ use aarect::{XyRect, XzRect, YzRect};
 use box_::Box_;
 use camera::Camera;
 use color::write_color;
-use hittable::Hittable;
+use hittable::{Hittable, RotateY, Translate};
 use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
@@ -74,7 +74,7 @@ fn main() {
 
     let height: usize = 600;
     let width: usize = 600;
-    let path = "output/2.15.jpg";
+    let path = "output/2.16.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.0;
@@ -148,6 +148,7 @@ fn main() {
         554.0,
         DiffuseLight::new(Box::new(SolidColor::new(Vec3::new(15.0, 15.0, 15.0)))),
     )));
+
     let white0 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white1 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white2 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
@@ -155,9 +156,9 @@ fn main() {
     let white4 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white5 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white6 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
-    world.add(Box::new(Box_::new(
-        Vec3::new(130.0, 0.0, 65.0),
-        Vec3::new(295.0, 165.0, 230.0),
+    let box1 = Box_::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 330.0, 165.0),
         white0,
         white1,
         white2,
@@ -165,7 +166,10 @@ fn main() {
         white4,
         white5,
         white6,
-    )));
+    );
+    let box2 = RotateY::new(15.0, Box::new(box1));
+    let box3 = Translate::new(Vec3::new(265.0, 0.0, 295.0), Box::new(box2));
+    world.add(Box::new(box3));
     let white0 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white1 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white2 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
@@ -173,9 +177,9 @@ fn main() {
     let white4 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white5 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white6 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
-    world.add(Box::new(Box_::new(
-        Vec3::new(265.0, 0.0, 295.0),
-        Vec3::new(430.0, 330.0, 460.0),
+    let box1 = Box_::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 165.0, 165.0),
         white0,
         white1,
         white2,
@@ -183,7 +187,10 @@ fn main() {
         white4,
         white5,
         white6,
-    )));
+    );
+    let box2 = RotateY::new(-18.0, Box::new(box1));
+    let box3 = Translate::new(Vec3::new(130.0, 0.0, 65.0), Box::new(box2));
+    world.add(Box::new(box3));
 
     let lookfrom = Vec3::new(278.0, 278.0, -800.0);
     let lookat = Vec3::new(278.0, 278.0, 0.0);
