@@ -1,4 +1,5 @@
 mod aabb;
+mod constant_medium;
 mod aarect;
 mod box_;
 mod camera;
@@ -13,6 +14,7 @@ mod sphere;
 mod texture;
 mod vec3;
 
+use constant_medium::ConstantMedium;
 use aarect::{XyRect, XzRect, YzRect};
 use box_::Box_;
 use camera::Camera;
@@ -21,7 +23,7 @@ use hittable::{Hittable, RotateY, Translate};
 use hittable_list::HittableList;
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
-use material::{Dielectric, DiffuseLight, Lambertian, Metal};
+use material::{Isotropic, Dielectric, DiffuseLight, Lambertian, Metal};
 use moving_sphere::MovingSphere;
 use rand::Rng;
 use ray::Ray;
@@ -74,7 +76,7 @@ fn main() {
 
     let height: usize = 600;
     let width: usize = 600;
-    let path = "output/2.16.jpg";
+    let path = "output/2.17.jpg";
     let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.0;
@@ -141,12 +143,12 @@ fn main() {
     )));
 
     world.add(Box::new(XzRect::new(
-        213.0,
-        343.0,
-        227.0,
-        332.0,
+        113.0,
+        443.0,
+        127.0,
+        432.0,
         554.0,
-        DiffuseLight::new(Box::new(SolidColor::new(Vec3::new(15.0, 15.0, 15.0)))),
+        DiffuseLight::new(Box::new(SolidColor::new(Vec3::new(7.0, 7.0, 7.0)))),
     )));
 
     let white0 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
@@ -169,7 +171,13 @@ fn main() {
     );
     let box2 = RotateY::new(15.0, Box::new(box1));
     let box3 = Translate::new(Vec3::new(265.0, 0.0, 295.0), Box::new(box2));
-    world.add(Box::new(box3));
+    let t = SolidColor::new(Vec3::new(0.0, 0.0, 0.0));
+    let m = Isotropic::new(Box::new(t));
+    world.add(Box::new(ConstantMedium::new(
+        0.01,
+        Box::new(box3),
+        Box::new(m),
+    )));
     let white0 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white1 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
     let white2 = Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73))));
@@ -190,7 +198,13 @@ fn main() {
     );
     let box2 = RotateY::new(-18.0, Box::new(box1));
     let box3 = Translate::new(Vec3::new(130.0, 0.0, 65.0), Box::new(box2));
-    world.add(Box::new(box3));
+    let t = SolidColor::new(Vec3::new(1.0, 1.0, 1.0));
+    let m = Isotropic::new(Box::new(t));
+    world.add(Box::new(ConstantMedium::new(
+        0.01,
+        Box::new(box3),
+        Box::new(m),
+    )));
 
     let lookfrom = Vec3::new(278.0, 278.0, -800.0);
     let lookat = Vec3::new(278.0, 278.0, 0.0);
