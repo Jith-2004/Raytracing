@@ -74,10 +74,10 @@ fn main() {
 
     println!("CI: {}", is_ci);
 
-    let height: usize = 800;
-    let width: usize = 800;
+    let height: usize = 600;
+    let width: usize = 600;
     let path = "output/2.18.jpg";
-    let quality = 200; // From 0 to 100, suggested value: 60
+    let quality = 100; // From 0 to 100, suggested value: 60
     let max_depth = 50;
     let aspect_ratio = 1.0;
 
