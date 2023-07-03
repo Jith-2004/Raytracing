@@ -29,15 +29,15 @@ use rand::Rng;
 use ray::Ray;
 use sphere::Sphere;
 use std::fs::File;
+use std::ops::Deref;
 use std::path::Path;
-use texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColor};
-pub use vec3::Vec3;
-use std::vec::Vec;
-use std::sync::{Mutex, Arc};
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::sleep;
-use std::time::{Duration,Instant};
-use std::ops::Deref;
+use std::time::{Duration, Instant};
+use std::vec::Vec;
+use texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColor};
+pub use vec3::Vec3;
 
 const AUTHOR: &str = "Stewie";
 
@@ -229,27 +229,30 @@ fn main() {
     for k in 0..15 {
         let counter = Arc::clone(&counter);
         let handle = thread::spawn(move || {
-        let mut world = new_world();
-        for j in (height - height / 15 * (k + 1)..=height - height / 15 * k - 1).rev() {
-            for i in 0..width {
-                let mut rng = rand::thread_rng();
-                let mut pixel_color: [u8; 3] = [0, 0, 0];
-                let mut pixel_color_ = Vec3::zero();
-                for _s in 0..quality {
-                    let u = (i as f64 + rng.gen::<f64>()) / (width - 1) as f64;
-                    let v = (j as f64 + rng.gen::<f64>()) / (height - 1) as f64;
-                    let r = cam.get_ray(u, v);
-                    pixel_color_ += ray_color(&r, &background, &world, max_depth);
+            let mut world = new_world();
+            for j in (height - height / 15 * (k + 1)..=height - height / 15 * k - 1).rev() {
+                for i in 0..width {
+                    let mut rng = rand::thread_rng();
+                    let mut pixel_color: [u8; 3] = [0, 0, 0];
+                    let mut pixel_color_ = Vec3::zero();
+                    for _s in 0..quality {
+                        let u = (i as f64 + rng.gen::<f64>()) / (width - 1) as f64;
+                        let v = (j as f64 + rng.gen::<f64>()) / (height - 1) as f64;
+                        let r = cam.get_ray(u, v);
+                        pixel_color_ += ray_color(&r, &background, &world, max_depth);
+                    }
+                    pixel_color[0] +=
+                        (clamp((pixel_color_.x() / quality as f64).sqrt()) * 255.999) as u8;
+                    pixel_color[1] +=
+                        (clamp((pixel_color_.y() / quality as f64).sqrt()) * 255.999) as u8;
+                    pixel_color[2] +=
+                        (clamp((pixel_color_.z() / quality as f64).sqrt()) * 255.999) as u8;
+                    let mut img = counter.lock().unwrap();
+                    write_color(pixel_color, &mut img, i, height - j - 1);
+                    //bar.inc(1);
                 }
-                pixel_color[0] += (clamp((pixel_color_.x() / quality as f64).sqrt()) * 255.999) as u8;
-                pixel_color[1] += (clamp((pixel_color_.y() / quality as f64).sqrt()) * 255.999) as u8;
-                pixel_color[2] += (clamp((pixel_color_.z() / quality as f64).sqrt()) * 255.999) as u8;
-                let mut img = counter.lock().unwrap();
-                write_color(pixel_color, &mut img, i, height - j - 1);
-                //bar.inc(1);
             }
-        }
-        world.clear();
+            world.clear();
         });
         handles.push(handle);
     }
@@ -260,7 +263,7 @@ fn main() {
 
     let img = counter.lock().unwrap();
 
-    let Img:RgbImage = img.deref().clone();
+    let Img: RgbImage = img.deref().clone();
 
     // Finish progress bar
     //bar.finish();
