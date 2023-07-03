@@ -32,6 +32,12 @@ use std::fs::File;
 use std::path::Path;
 use texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColor};
 pub use vec3::Vec3;
+use std::vec::Vec;
+use std::sync::{Mutex, Arc};
+use std::thread;
+use std::thread::sleep;
+use std::time::{Duration,Instant};
+use std::ops::Deref;
 
 const AUTHOR: &str = "Stewie";
 
@@ -68,33 +74,7 @@ fn clamp(x: f64) -> f64 {
     }
 }
 
-fn main() {
-    // get environment variable CI, which is true for GitHub Actions
-    let is_ci = is_ci();
-
-    println!("CI: {}", is_ci);
-
-    let height: usize = 600;
-    let width: usize = 600;
-    let path = "output/2.18.jpg";
-    let quality = 100; // From 0 to 100, suggested value: 60
-    let max_depth = 50;
-    let aspect_ratio = 1.0;
-
-    // Create image data
-    let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
-
-    // Progress bar UI powered by library `indicatif`
-    // You can use indicatif::ProgressStyle to make it more beautiful
-    // You can also use indicatif::MultiProgress in multi-threading to show progress of each thread
-    let bar = if is_ci {
-        ProgressBar::hidden()
-    } else {
-        ProgressBar::new((height * width) as u64)
-    };
-
-    let background = Vec3::zero();
-
+fn new_world() -> HittableList {
     let mut rng = rand::thread_rng();
 
     let mut world = HittableList::new();
@@ -194,7 +174,37 @@ fn main() {
             Lambertian::new(Box::new(SolidColor::new(Vec3::new(0.73, 0.73, 0.73)))),
         )))
     }
+    world
+}
 
+fn main() {
+    let now = Instant::now();
+
+    // get environment variable CI, which is true for GitHub Actions
+    let is_ci = is_ci();
+
+    println!("CI: {}", is_ci);
+
+    let height: usize = 600;
+    let width: usize = 600;
+    let path = "output/test_.jpg";
+    let quality = 250; // From 0 to 100, suggested value: 60
+    let max_depth = 50;
+    let aspect_ratio = 1.0;
+
+    // Create image data
+    let mut img: RgbImage = ImageBuffer::new(width.try_into().unwrap(), height.try_into().unwrap());
+
+    // Progress bar UI powered by library `indicatif`
+    // You can use indicatif::ProgressStyle to make it more beautiful
+    // You can also use indicatif::MultiProgress in multi-threading to show progress of each thread
+    let bar = if is_ci {
+        ProgressBar::hidden()
+    } else {
+        ProgressBar::new((height * width) as u64)
+    };
+
+    let background = Vec3::zero();
     let lookfrom = Vec3::new(478.0, 278.0, -600.0);
     let lookat = Vec3::new(278.0, 278.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
@@ -213,35 +223,56 @@ fn main() {
         1.0,
     );
 
-    for j in (0..=height - 1).rev() {
-        for i in 0..width {
-            let mut pixel_color: [u8; 3] = [0, 0, 0];
-            let mut pixel_color_ = Vec3::zero();
-            for _s in 0..quality {
-                let u = (i as f64 + rng.gen::<f64>()) / (width - 1) as f64;
-                let v = (j as f64 + rng.gen::<f64>()) / (height - 1) as f64;
-                let r = cam.get_ray(u, v);
-                pixel_color_ += ray_color(&r, &background, &world, max_depth);
+    let counter = Arc::new(Mutex::new(img));
+    let mut handles = vec![];
+
+    for k in 0..15 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+        let mut world = new_world();
+        for j in (height - height / 15 * (k + 1)..=height - height / 15 * k - 1).rev() {
+            for i in 0..width {
+                let mut rng = rand::thread_rng();
+                let mut pixel_color: [u8; 3] = [0, 0, 0];
+                let mut pixel_color_ = Vec3::zero();
+                for _s in 0..quality {
+                    let u = (i as f64 + rng.gen::<f64>()) / (width - 1) as f64;
+                    let v = (j as f64 + rng.gen::<f64>()) / (height - 1) as f64;
+                    let r = cam.get_ray(u, v);
+                    pixel_color_ += ray_color(&r, &background, &world, max_depth);
+                }
+                pixel_color[0] += (clamp((pixel_color_.x() / quality as f64).sqrt()) * 255.999) as u8;
+                pixel_color[1] += (clamp((pixel_color_.y() / quality as f64).sqrt()) * 255.999) as u8;
+                pixel_color[2] += (clamp((pixel_color_.z() / quality as f64).sqrt()) * 255.999) as u8;
+                let mut img = counter.lock().unwrap();
+                write_color(pixel_color, &mut img, i, height - j - 1);
+                //bar.inc(1);
             }
-            pixel_color[0] += (clamp((pixel_color_.x() / quality as f64).sqrt()) * 255.999) as u8;
-            pixel_color[1] += (clamp((pixel_color_.y() / quality as f64).sqrt()) * 255.999) as u8;
-            pixel_color[2] += (clamp((pixel_color_.z() / quality as f64).sqrt()) * 255.999) as u8;
-            write_color(pixel_color, &mut img, i, height - j - 1);
-            bar.inc(1);
         }
+        world.clear();
+        });
+        handles.push(handle);
     }
 
-    world.clear();
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    let img = counter.lock().unwrap();
+
+    let Img:RgbImage = img.deref().clone();
 
     // Finish progress bar
-    bar.finish();
+    //bar.finish();
 
     // Output image to file
     println!("Ouput image as \"{}\"\n Author: {}", path, AUTHOR);
-    let output_image = image::DynamicImage::ImageRgb8(img);
+    let output_image = image::DynamicImage::ImageRgb8(Img);
     let mut output_file = File::create(path).unwrap();
     match output_image.write_to(&mut output_file, image::ImageOutputFormat::Jpeg(quality)) {
         Ok(_) => {}
         Err(_) => println!("Outputting image fails."),
     }
+    let end = now.elapsed().as_secs();
+    println!("runtime {:?} s", end);
 }
